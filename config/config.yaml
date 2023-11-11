@@ -1,0 +1,16 @@
+search_algorithm: pso  # Options: pso, clash
+cost_function: revenue  # Options: sphere, schwefel, schaffer, griewank, func7, func8, func9, func11, revenue
+dimension: 2
+x_initial: null  # A d-dimensional list, such as [1.0, -1.0], or null. If null, the x_initial will be a random point in the domain.
+
+pso:
+  max_itr: 500
+  num_particles: 10
+  alpha_1: 0.01
+  alpha_2: 0.01
+  alpha_3: 0.01
+  local_best_option: 'so_far'  # Options: this_iteration, so_far
+  global_best_option: 'so_far'  # Options: this_iteration, so_far
+  local_search:
+    max_itr: 100
+    convergence_threshold: 0.01
