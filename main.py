@@ -1,7 +1,6 @@
 import yaml
 from typing import Dict
-from utils import search_algorithms, cost_functions, plot_utils
-
+from utils import search_algorithms, cost_functions, plot_utils, particle_class
 
 def main(config: Dict) -> None:
     # Get the cost function
@@ -54,7 +53,7 @@ def main(config: Dict) -> None:
     # Get the search algorithm
     if config["search_algorithm"] == "pso":
         # Set up PSO Container that runs algorithm for each particle
-        pso_container = search_algorithms.PSO(
+        pso_container = particle_class.PSO(
             cost_function=cost_function,
             max_itr=config["pso"]["max_itr"],
             x_range=x_range,
@@ -65,15 +64,13 @@ def main(config: Dict) -> None:
                 "convergence_threshold"
             ],
         )
+        
+        elixir_max = config["pso"]["max_elixir"]
+        troop_types = config["pso"]["troops"]
 
-        # Add the particles required for PSO
-        for particle_i in range(config["pso"]["num_particles"]):
-            particle = search_algorithms.DefaultParticle(
-                alpha_1=config["pso"]["alpha_1"],
-                alpha_2=config["pso"]["alpha_2"],
-                alpha_3=config["pso"]["alpha_3"],
-            )
-            pso_container.add_particle(particle)
+        troops = particle_class.ClashParticle(elixir_max,troop_types)
+        for troop in troops.troop_list:
+            pso_container.add_particle(troop)
 
         # Run PSO algorithm with added particles
         (

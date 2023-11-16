@@ -69,221 +69,74 @@ def local_search(
 
     return best_x, best_cost, x_history, cost_history
 
+def variable_neighborhood_search(cost_function: Callable, max_itr_ils: int, max_itr_ls: int, convergence_threshold: float, d: int,
+                           x_range: Optional[List[List[float]]] = None) -> Tuple[np.array, float, List[np.array], List[float]]:
+    global_best_cost_index = -1
+    global_best_x = -1
+    global_best_cost = float('inf')
 
-class BaseParticle:
-    def __init__(self):
-        self.position = None
-        self.velocity = None
-        self.best_position = None
-        self.best_cost = None
-        self.position_history = None
-        self.local_best_position = None
+    # Split each dimension into K intervals
+    K = 2
+    # Note there will be k**d number of neighborhoods based on the K split we perform here
+    # Create ranges of x intervals based on the K split
+    x_intervals = []
+    for dim_range in x_range:
+        lower_bound, upper_bound = dim_range
+        interval_size = (upper_bound - lower_bound) / K
+        intervals = np.arange(lower_bound, upper_bound + interval_size, interval_size)
+        x_intervals.append(intervals)
 
-        # values that need to be set by the algorithm container
-        self.x_range = None
-        self.cost_function = None
-        self.local_best_option = None
+    # Generate neighborhoods with different bounds for searching
+    neighborhoods = []
+    for indices in np.ndindex(*([K] * d)):
+        bounds = []
+        for dim, index in enumerate(indices):
+            lower_bound, upper_bound = x_intervals[dim][index], x_intervals[dim][index + 1]
+            bounds.append([lower_bound, upper_bound])
+        neighborhood = bounds
+        neighborhoods.append(neighborhood)
 
-        # particle needs values initialized by container
-        self.particle_initialized = False
+    neighborhood_index = 0
 
-    def initialize_particle_internals(self):
-        assert self.x_range is not None
-        assert self.cost_function is not None
+    x_history = []
+    cost_history = []
+    
+    while neighborhood_index < len(neighborhoods):
+        neighborhood = neighborhoods[neighborhood_index]
+        # Find random point in the neighborhood
+        x_current = [random.uniform(neighborhood[i][0], neighborhood[i][1]) for i in range(len(neighborhood))]
+        
+        # Do local search
+        print(f"Searching x:{x_current}")
+        best_x, best_cost, _, _ = local_search(cost_function=cost_function, max_itr=max_itr_ls, convergence_threshold=convergence_threshold,
+                                            x_initial=x_current, x_range=neighborhood)
+        x_history.append(best_x)
+        cost_history.append(best_cost)
 
-        self.position = np.array([random.uniform(x[0], x[1]) for x in self.x_range])
-        self.velocity = np.array(
-            [random.uniform(-1, 1) for _ in range(len(self.x_range))]
-        )
-        self.best_position = self.position
-        self.best_cost = float("inf")
-        self.position_history = []
-        self.local_best_position = None
-
-        # set particle intialization flag to True
-        self.particle_initialized = True
-
-    def set_x_range(self, x_range: Optional[List[List[float]]]):
-        self.x_range = x_range
-
-    def set_cost_function(self, cost_function: Callable):
-        self.cost_function = cost_function
-
-    def set_best_position(self, best_position):
-        self.best_position = best_position
-
-    def set_local_best_option(self, local_best_option: str):
-        self.local_best_option = local_best_option
-
-    def perform_local_search(self, max_itr: int, convergence_threshold: float):
-        assert self.particle_initialized
-        search_position, search_cost, _, _ = local_search(
-            cost_function=self.cost_function,
-            max_itr=max_itr,
-            convergence_threshold=convergence_threshold,
-            x_initial=self.position,
-            x_range=self.x_range,
-            hide_progress_bar=True,
-        )
-
-        # Find the local best particle (for use in the velocity vector):
-        if self.local_best_option == "this_iteration":
-            self.local_best_position = search_position
-        elif self.local_best_option == "so_far":
-            if search_cost < self.best_cost:
-                self.best_cost = search_cost
-                self.best_position = search_position
-                self.local_best_position = self.best_position
+        # If we find a cost better than the global one, we restart our search at n=0
+        # Otherwise we check the next neighbor at n+1
+        if best_cost < global_best_cost:
+            print(f"Cost:{global_best_cost}")
+            global_best_cost = best_cost
+            global_best_x = best_x
+            neighborhood_index = 0
         else:
-            raise ValueError("No local best option selected")
+            neighborhood_index+=1
 
-        return search_position, search_cost
+    # Get the best solution
+    global_best_cost_index = np.argmin(cost_history)
+    global_best_x = x_history[global_best_cost_index]
+    global_best_cost = cost_history[global_best_cost_index]
 
-    def bound_solution_in_x_range(self, x: List[float]) -> List[float]:
-        for j in range(len(x)):
-            if x[j] < self.x_range[j][0]:
-                x[j] = self.x_range[j][0]
-            elif x[j] > self.x_range[j][1]:
-                x[j] = self.x_range[j][1]
-        return x
+    return global_best_x, global_best_cost, x_history, cost_history
 
-    @abstractmethod
-    def update_position(self, global_best_position: List[float]):
-        pass
-
-    @abstractmethod
-    def update_velocity(self, global_best_position: List[float]):
-        pass
-
-    def update(self, global_best_position: List[float]):
-        # assert self.particle_initalized == True
-        self.update_position(global_best_position)
-        self.update_velocity(global_best_position)
-
-
-class DefaultParticle(BaseParticle):
-    def __init__(
-        self,
-        alpha_1: float,
-        alpha_2: float,
-        alpha_3: float,
-        *args,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-        self.alpha_1 = alpha_1
-        self.alpha_2 = alpha_2
-        self.alpha_3 = alpha_3
-
-    def update_velocity(self, global_best_position: List[float]):
-        self.velocity = (
-            self.alpha_1 * self.velocity
-            + self.alpha_2 * (self.local_best_position - self.position)
-            + self.alpha_3 * (global_best_position - self.position)
-        )
-
-    def update_position(self, global_best_position: List[float]):
-        self.position = self.position + self.velocity
-        self.position = self.bound_solution_in_x_range(x=self.position)
-        self.position_history.append(self.position)
-
-
-class PSO:
-    def __init__(
-        self,
-        cost_function: Callable,
-        max_itr: int,
-        x_range: Optional[List[List[float]]],
-        local_best_option: Optional[str] = "this_iteration",
-        global_best_option: Optional[str] = "this_iteration",
-        ls_max_itr: Optional[int] = 100,
-        ls_convergence_threshold: Optional[float] = 0.01,
-    ):
-        self.cost_function = cost_function
-        self.max_itr = max_itr
-        self.x_range = x_range
-        self.local_best_option = local_best_option
-        self.global_best_option = global_best_option
-        self.ls_max_itr = ls_max_itr
-        self.ls_convergence_threshold = ls_convergence_threshold
-        self.particle_container = []
-
-    def add_particle(self, particle: BaseParticle):
-        particle.set_x_range(self.x_range)
-        particle.set_cost_function(self.cost_function)
-        particle.set_local_best_option(self.local_best_option)
-        particle.initialize_particle_internals()
-        self.particle_container.append(particle)
-
-    def run_algorithm(self, x_initial: Optional[np.array] = None):
-        # Set the x_initial
-        if x_initial is None:
-            x_initial = [
-                random.uniform(self.x_range[i][0], self.x_range[i][1])
-                for i in range(len(self.x_range))
-            ]
-
-        for particle in self.particle_container:
-            particle.set_best_position(x_initial)
-
-        overall_best_position = x_initial
-        overall_best_cost = float("inf")
-
-        position_history = []
-        cost_history = []
-
-        progress_bar = tqdm(total=self.max_itr, desc="Iterations")
-
-        for _ in range(self.max_itr):
-            best_positions_in_this_iteration, best_costs_in_this_iteration = [], []
-
-            for particle in self.particle_container:
-                best_x, best_cost = particle.perform_local_search(
-                    max_itr=self.ls_max_itr,
-                    convergence_threshold=self.ls_convergence_threshold,
-                )
-
-                best_positions_in_this_iteration.append(best_x)
-                best_costs_in_this_iteration.append(best_cost)
-
-            # Find the best solution of this iteration
-            best_cost_index_in_this_iteration = np.argmin(best_costs_in_this_iteration)
-            best_cost_in_this_iteration = best_costs_in_this_iteration[
-                best_cost_index_in_this_iteration
-            ]
-            best_position_in_this_iteration = best_positions_in_this_iteration[
-                best_cost_index_in_this_iteration
-            ]
-            if best_cost_in_this_iteration < overall_best_cost:
-                overall_best_cost = best_cost_in_this_iteration
-                overall_best_position = best_position_in_this_iteration
-
-            # Find the global best particle (for use in the velocity vector):
-            if self.global_best_option == "this_iteration":
-                global_best_position = best_position_in_this_iteration
-            elif self.global_best_option == "so_far":
-                global_best_position = overall_best_position
-
-            # Update every particle (using regularization hyper-parameters)
-            for particle in self.particle_container:
-                particle.update(global_best_position)
-
-            position_history.append(overall_best_position)
-            cost_history.append(overall_best_cost)
-
-            # Update the tqdm progress bar
-            progress_bar.update(1)
-
-        progress_bar.close()
-
-        particles = [
-            {"position_history": particle.position_history}
-            for particle in self.particle_container
-        ]
-        return (
-            overall_best_position,
-            overall_best_cost,
-            position_history,
-            cost_history,
-            particles,
-        )
+##############################################################################################################
+############ Helper Functions ################################################################################
+##############################################################################################################
+def bound_solution_in_x_range(x: List[float], x_range: List[List[float]]) -> List[float]:
+    for j in range(len(x)):
+        if x[j] < x_range[j][0]:
+            x[j] = x_range[j][0]
+        elif x[j] > x_range[j][1]:
+            x[j] = x_range[j][1]
+    return x
