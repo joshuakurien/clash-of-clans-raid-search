@@ -16,36 +16,36 @@ pso:
       giant:
         elixir_cost: 5
         alpha_values:
-          alpha_1: 0.1
-          alpha_2: 0.2
-          alpha_3: 0.3
+          alpha_1: 0.13
+          alpha_2: 0.12
+          alpha_3: 0.12
       archer:
         elixir_cost: 3
         alpha_values:
-          alpha_1: 0.5
-          alpha_2: 0.6
-          alpha_3: 0.7
+          alpha_1: 1.74
+          alpha_2: 4.84
+          alpha_3: 1.66
       goblin:
         elixir_cost: 2
         alpha_values:
-          alpha_1: 0.2
-          alpha_2: 0.4
-          alpha_3: 0.6
+          alpha_1: 4.21
+          alpha_2: 3.42
+          alpha_3: 2.60
       wizard:
         elixir_cost: 4
         alpha_values:
-          alpha_1: 0.3
-          alpha_2: 0.5
-          alpha_3: 0.7
+          alpha_1: 2.82
+          alpha_2: 2.82
+          alpha_3: 2.81
       dragon:
         elixir_cost: 10
         alpha_values:
-          alpha_1: 0.4
-          alpha_2: 0.6
-          alpha_3: 0.8
+          alpha_1: 5.00
+          alpha_2: 9.00
+          alpha_3: 7.10
       hog_rider:
         elixir_cost: 6
         alpha_values:
-          alpha_1: 0.8
-          alpha_2: 0.7
-          alpha_3: 0.6
+          alpha_1: 3.04
+          alpha_2: 4.32
+          alpha_3: 3.71
