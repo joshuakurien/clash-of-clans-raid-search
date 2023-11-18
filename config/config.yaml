@@ -5,12 +5,47 @@ x_initial: null  # A d-dimensional list, such as [1.0, -1.0], or null. If null, 
 
 pso:
   max_itr: 500
-  num_particles: 10
-  alpha_1: 0.01
-  alpha_2: 0.01
-  alpha_3: 0.01
+  max_elixir: 20
   local_best_option: 'so_far'  # Options: this_iteration, so_far
   global_best_option: 'so_far'  # Options: this_iteration, so_far
   local_search:
     max_itr: 100
     convergence_threshold: 0.01
+  
+  troops:
+      giant:
+        elixir_cost: 5
+        alpha_values:
+          alpha_1: 0.1
+          alpha_2: 0.2
+          alpha_3: 0.3
+      archer:
+        elixir_cost: 3
+        alpha_values:
+          alpha_1: 0.5
+          alpha_2: 0.6
+          alpha_3: 0.7
+      goblin:
+        elixir_cost: 2
+        alpha_values:
+          alpha_1: 0.2
+          alpha_2: 0.4
+          alpha_3: 0.6
+      wizard:
+        elixir_cost: 4
+        alpha_values:
+          alpha_1: 0.3
+          alpha_2: 0.5
+          alpha_3: 0.7
+      dragon:
+        elixir_cost: 10
+        alpha_values:
+          alpha_1: 0.4
+          alpha_2: 0.6
+          alpha_3: 0.8
+      hog_rider:
+        elixir_cost: 6
+        alpha_values:
+          alpha_1: 0.8
+          alpha_2: 0.7
+          alpha_3: 0.6
