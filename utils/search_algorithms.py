@@ -69,67 +69,6 @@ def local_search(
 
     return best_x, best_cost, x_history, cost_history
 
-def variable_neighborhood_search(cost_function: Callable, max_itr_ils: int, max_itr_ls: int, convergence_threshold: float, d: int,
-                           x_range: Optional[List[List[float]]] = None) -> Tuple[np.array, float, List[np.array], List[float]]:
-    global_best_cost_index = -1
-    global_best_x = -1
-    global_best_cost = float('inf')
-
-    # Split each dimension into K intervals
-    K = 2
-    # Note there will be k**d number of neighborhoods based on the K split we perform here
-    # Create ranges of x intervals based on the K split
-    x_intervals = []
-    for dim_range in x_range:
-        lower_bound, upper_bound = dim_range
-        interval_size = (upper_bound - lower_bound) / K
-        intervals = np.arange(lower_bound, upper_bound + interval_size, interval_size)
-        x_intervals.append(intervals)
-
-    # Generate neighborhoods with different bounds for searching
-    neighborhoods = []
-    for indices in np.ndindex(*([K] * d)):
-        bounds = []
-        for dim, index in enumerate(indices):
-            lower_bound, upper_bound = x_intervals[dim][index], x_intervals[dim][index + 1]
-            bounds.append([lower_bound, upper_bound])
-        neighborhood = bounds
-        neighborhoods.append(neighborhood)
-
-    neighborhood_index = 0
-
-    x_history = []
-    cost_history = []
-    
-    while neighborhood_index < len(neighborhoods):
-        neighborhood = neighborhoods[neighborhood_index]
-        # Find random point in the neighborhood
-        x_current = [random.uniform(neighborhood[i][0], neighborhood[i][1]) for i in range(len(neighborhood))]
-        
-        # Do local search
-        print(f"Searching x:{x_current}")
-        best_x, best_cost, _, _ = local_search(cost_function=cost_function, max_itr=max_itr_ls, convergence_threshold=convergence_threshold,
-                                            x_initial=x_current, x_range=neighborhood)
-        x_history.append(best_x)
-        cost_history.append(best_cost)
-
-        # If we find a cost better than the global one, we restart our search at n=0
-        # Otherwise we check the next neighbor at n+1
-        if best_cost < global_best_cost:
-            print(f"Cost:{global_best_cost}")
-            global_best_cost = best_cost
-            global_best_x = best_x
-            neighborhood_index = 0
-        else:
-            neighborhood_index+=1
-
-    # Get the best solution
-    global_best_cost_index = np.argmin(cost_history)
-    global_best_x = x_history[global_best_cost_index]
-    global_best_cost = cost_history[global_best_cost_index]
-
-    return global_best_x, global_best_cost, x_history, cost_history
-
 ##############################################################################################################
 ############ Helper Functions ################################################################################
 ##############################################################################################################
