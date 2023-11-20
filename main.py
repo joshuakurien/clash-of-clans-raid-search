@@ -1,6 +1,6 @@
 import yaml
 from typing import Dict
-from utils import search_algorithms, cost_functions, plot_utils, particle_class
+from utils import search_algorithms, cost_functions, plot_utils, particle_class, neighborhood_generation
 
 def main(config: Dict) -> None:
     # Get the cost function
@@ -52,6 +52,9 @@ def main(config: Dict) -> None:
 
     # Get the search algorithm
     if config["search_algorithm"] == "pso":
+        # generate neighborhoods based on x-range
+        neighborhoods = neighborhood_generation.generate_neighborhoods(2, 2, x_range)
+        
         # Set up PSO Container that runs algorithm for each particle
         pso_container = particle_class.PSO(
             cost_function=cost_function,
@@ -63,6 +66,7 @@ def main(config: Dict) -> None:
             ls_convergence_threshold=config["pso"]["local_search"][
                 "convergence_threshold"
             ],
+            neighborhoods=neighborhoods
         )
         
         elixir_max = config["pso"]["max_elixir"]

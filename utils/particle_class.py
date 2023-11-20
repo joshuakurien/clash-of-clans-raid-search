@@ -167,6 +167,7 @@ class PSO:
         global_best_option: Optional[str] = "this_iteration",
         ls_max_itr: Optional[int] = 100,
         ls_convergence_threshold: Optional[float] = 0.01,
+        neighborhoods = None,
     ):
         self.cost_function = cost_function
         self.max_itr = max_itr
@@ -176,6 +177,7 @@ class PSO:
         self.ls_max_itr = ls_max_itr
         self.ls_convergence_threshold = ls_convergence_threshold
         self.particle_container = []
+        self.neighborhoods = neighborhoods
 
     def add_particle(self, particle: BaseParticle):
         particle.set_x_range(self.x_range)
