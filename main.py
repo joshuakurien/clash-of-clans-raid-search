@@ -77,13 +77,15 @@ def main(config: Dict) -> None:
             pso_container.add_particle(troop)
 
         # Run PSO algorithm with added particles
+        pso_container.run_algorithm_across_neighborhoods()
+
         (
             best_x,
             best_cost,
             x_history,
             cost_history,
             individuals,
-        ) = pso_container.run_algorithm(x_initial=config["x_initial"])
+        ) = pso_container.run_algorithm(x_initial=config["x_initial"], x_range=x_range)
 
     if len(best_x) == 2:
         # If the dimensionality is 2, visualize the results.

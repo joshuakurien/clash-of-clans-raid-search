@@ -186,16 +186,33 @@ class PSO:
         particle.initialize_particle_internals()
         self.particle_container.append(particle)
 
-    def run_algorithm(self, x_initial: Optional[np.array] = None):
+    def run_algorithm_across_neighborhoods(self):
+        for current_neighborhood in self.neighborhoods:
+            print ("Current neighborhood = ", current_neighborhood)
+            (
+                best_x,
+                best_cost,
+                x_history,
+                cost_history,
+                individuals,
+            ) = self.run_algorithm(x_initial=None, x_range=current_neighborhood)
+            print ("best_x = ", best_x)
+            print ("best_cost = ", best_cost)
+            print ("---------------------------------------------------\n")
+
+    def run_algorithm(self, x_initial: Optional[np.array] = None,  x_range = None):
         # Set the x_initial
         if x_initial is None:
             x_initial = [
-                random.uniform(self.x_range[i][0], self.x_range[i][1])
-                for i in range(len(self.x_range))
+                random.uniform(x_range[i][0], x_range[i][1])
+                for i in range(len(x_range))
             ]
 
+        # update all particles for new neighborhood
         for particle in self.particle_container:
             particle.set_best_position(x_initial)
+            particle.set_x_range(x_range)
+            particle.initialize_particle_internals()
 
         overall_best_position = x_initial
         overall_best_cost = float("inf")
