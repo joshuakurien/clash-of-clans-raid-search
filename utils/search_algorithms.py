@@ -46,11 +46,11 @@ def local_search(
         cost_neighbor = cost_function(x_neighbor)
 
         # Accept the neighbor if it has lower cost
-        if cost_neighbor <= cost_current:
+        if cost_neighbor < cost_current:
             x_current = x_neighbor
             cost_current = cost_neighbor
-            if (cost_current < convergence_threshold) or (itr >= max_itr):
-                convergence = True
+        if (itr >= max_itr): 
+            convergence = True
 
         x_history.append(x_current)
         cost_history.append(cost_current)
