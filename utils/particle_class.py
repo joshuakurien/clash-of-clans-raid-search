@@ -187,8 +187,10 @@ class PSO:
         self.particle_container.append(particle)
 
     def run_algorithm_across_neighborhoods(self):
+        top_neighborhoods = []
+        neighborhood_num = 0
         for current_neighborhood in self.neighborhoods:
-            print ("Current neighborhood = ", current_neighborhood)
+            print ("Current neighborhood = ", current_neighborhood, ", num = ", neighborhood_num)
             (
                 best_x,
                 best_cost,
@@ -199,6 +201,21 @@ class PSO:
             print ("best_x = ", best_x)
             print ("best_cost = ", best_cost)
             print ("---------------------------------------------------\n")
+            neighborhood_num += 1
+
+            # Check if the current neighborhood is among the top 3
+            if len(top_neighborhoods) < 3:
+                top_neighborhoods.append({'neighborhood': current_neighborhood, 'cost': best_cost, 'argmax': best_x})
+            else:
+                # Check if the current neighborhood has a higher cost than the minimum cost in the top 3
+                max_cost_neighborhood = max(top_neighborhoods, key=lambda x: x['cost'])
+                if best_cost < max_cost_neighborhood['cost']:
+                    # Replace the neighborhood with the maximum cost in the top 3
+                    max_cost_neighborhood['neighborhood'] = current_neighborhood
+                    max_cost_neighborhood['cost'] = best_cost
+                    max_cost_neighborhood['argmax'] = best_x
+
+        return top_neighborhoods
 
     def run_algorithm(self, x_initial: Optional[np.array] = None,  x_range = None):
         # Set the x_initial

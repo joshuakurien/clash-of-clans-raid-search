@@ -53,7 +53,7 @@ def main(config: Dict) -> None:
     # Get the search algorithm
     if config["search_algorithm"] == "pso":
         # generate neighborhoods based on x-range
-        neighborhoods = neighborhood_generation.generate_neighborhoods(2, 2, x_range)
+        neighborhoods = neighborhood_generation.generate_neighborhoods(5, 5, x_range)
         
         # Set up PSO Container that runs algorithm for each particle
         pso_container = particle_class.PSO(
@@ -77,7 +77,11 @@ def main(config: Dict) -> None:
             pso_container.add_particle(troop)
 
         # Run PSO algorithm with added particles
-        pso_container.run_algorithm_across_neighborhoods()
+        top_neighborhoods = pso_container.run_algorithm_across_neighborhoods()
+
+        print("Top Neighborhoods =>\n")
+        for neighborhood in top_neighborhoods:
+            print (neighborhood)
 
         (
             best_x,
