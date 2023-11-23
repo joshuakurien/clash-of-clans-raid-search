@@ -81,7 +81,7 @@ def main(config: Dict) -> None:
 
         print("Top Neighborhoods =>\n")
         for neighborhood in top_neighborhoods:
-            print (neighborhood)
+            print (neighborhood['neighborhood'], neighborhood['cost'], neighborhood['argmax'])
 
         (
             best_x,
