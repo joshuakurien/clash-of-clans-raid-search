@@ -54,7 +54,7 @@ def main(config: Dict) -> None:
     if config["search_algorithm"] == "pso":
         # generate neighborhoods based on x-range
         neighborhoods = neighborhood_generation.generate_neighborhoods(5, 5, x_range)
-        
+
         # Set up PSO Container that runs algorithm for each particle
         pso_container = particle_class.PSO(
             cost_function=cost_function,
@@ -81,40 +81,37 @@ def main(config: Dict) -> None:
 
         print("Top Neighborhoods =>\n")
         for neighborhood in top_neighborhoods:
-            print (neighborhood['neighborhood'], neighborhood['cost'], neighborhood['argmax'])
-
-        (
-            best_x,
-            best_cost,
-            x_history,
-            cost_history,
-            individuals,
-        ) = pso_container.run_algorithm(x_initial=config["x_initial"], x_range=x_range)
-
-    if len(best_x) == 2:
-        # If the dimensionality is 2, visualize the results.
-        plot_utils.plot_results(
-            best_x=best_x,
-            best_cost=best_cost,
-            x_history=x_history,
-            cost_history=cost_history,
-            cost_function=cost_function,
-            x_range=x_range,
-        )
-        if (config["search_algorithm"] == "pso") or (
-            config["search_algorithm"] == "ga"
-        ):
-            plot_utils.plot_results_with_population(
-                best_x=best_x,
-                individuals=individuals,
+            # rounding the float values
+            neighborhood['neighborhood'] = [ [round(i, 2) for i in elem] for elem in neighborhood['neighborhood'] ]
+            neighborhood['best_x'] = [ round(elem, 2) for elem in neighborhood['best_x'] ]
+            print("Neighborhood range: ", neighborhood['neighborhood'])
+            print("Neighborhood cost: %.2f" % neighborhood['best_cost'])
+            print("Location in neighborhood: ", neighborhood['best_x'])
+            
+            # plotting the neighborhood
+            if len(neighborhood['best_x']) == 2:
+            # If the dimensionality is 2, visualize the results.
+                plot_utils.plot_results(
+                best_x=neighborhood['best_x'],
+                best_cost=neighborhood['best_cost'],
+                x_history=neighborhood['x_history'],
+                cost_history=neighborhood['cost_history'],
                 cost_function=cost_function,
-                x_range=x_range,
+                x_range=neighborhood['neighborhood'],
             )
+            if (config["search_algorithm"] == "pso") or (
+                config["search_algorithm"] == "ga"
+            ):
+                plot_utils.plot_results_with_population(
+                    best_x=neighborhood['best_x'],
+                    individuals=neighborhood['individuals'],
+                    cost_function=cost_function,
+                    x_range=x_range,
+                )
 
-        if config["cost_function"] == "revenue":
-            print(f"Cost of trucks: {best_x[0]}")
-            print(f"Cost of sedans: {best_x[1]}")
-
+            if config["cost_function"] == "revenue":
+                print(f"Cost of trucks: {neighborhood['best_x'][0]}")
+                print(f"Cost of sedans: {neighborhood['best_x'][1]}")
 
 if __name__ == "__main__":
     with open("./config/config.yaml", "r") as f:

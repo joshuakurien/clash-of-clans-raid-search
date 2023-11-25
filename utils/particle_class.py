@@ -200,7 +200,7 @@ class PSO:
             ) = self.run_algorithm(x_initial=None, x_range=current_neighborhood)
             print ("best_x = ", best_x)
             print ("best_cost = ", best_cost)
-            neighborhood_data = {'neighborhood': current_neighborhood, 'cost': best_cost, 'argmax': best_x,
+            neighborhood_data = {'neighborhood': current_neighborhood, 'best_cost': best_cost, 'best_x': best_x,
                                  'x_history': x_history, 'cost_history': cost_history, 'individuals': individuals}
             neighborhood_num += 1
 
@@ -209,9 +209,9 @@ class PSO:
                 top_neighborhoods.append(neighborhood_data)
             else:
                 # Check if the current neighborhood has a higher cost than the minimum cost in the top 3
-                max_cost_neighborhood_index, _ = max(enumerate(top_neighborhoods), key=lambda x: x[1]['cost'])
+                max_cost_neighborhood_index, _ = max(enumerate(top_neighborhoods), key=lambda x: x[1]['best_cost'])
                 max_cost_neighborhood = top_neighborhoods[max_cost_neighborhood_index]
-                if best_cost < max_cost_neighborhood['cost']:
+                if best_cost < max_cost_neighborhood['best_cost']:
                     # Replace the neighborhood with the maximum cost in the top 3
                     top_neighborhoods[max_cost_neighborhood_index] = neighborhood_data
             print ("---------------------------------------------------\n")
