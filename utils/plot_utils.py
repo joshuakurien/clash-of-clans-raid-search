@@ -38,7 +38,7 @@ def plot_results(best_x: np.array, best_cost: float, x_history: List[np.array], 
     ax.set_xlabel('x1')
     ax.set_ylabel('x2')
     ax.set_zlabel('Cost')
-    ax.set_title('Cost function and optimization')
+    ax.set_title('Cost function and optimization in neighborhood (3D)')
     plt.legend()
     plt.show()
 
@@ -52,7 +52,7 @@ def plot_results(best_x: np.array, best_cost: float, x_history: List[np.array], 
     plt.colorbar(label='Cost')
     plt.xlabel('x1')
     plt.ylabel('x2')
-    plt.title('Cost function and optimization')
+    plt.title('Cost function and optimization  in neighborhood (2D)')
     plt.grid(True)
 
     # Overlay the optimization path on the heatmap as red dots

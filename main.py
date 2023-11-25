@@ -106,7 +106,7 @@ def main(config: Dict) -> None:
                     best_x=neighborhood['best_x'],
                     individuals=neighborhood['individuals'],
                     cost_function=cost_function,
-                    x_range=x_range,
+                    x_range=neighborhood['neighborhood'],
                 )
 
             if config["cost_function"] == "revenue":
