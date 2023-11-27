@@ -16,5 +16,11 @@
         "cost_function": "revenue",
         "final_cost": 274225900.64544237,
         "runtime": 0.011097908020019531
+    },
+    {
+        "algorithm": "pso_regular",
+        "cost_function": "revenue",
+        "final_cost": -181377617.65602878,
+        "runtime": 1.0116119384765625
     }
 ]

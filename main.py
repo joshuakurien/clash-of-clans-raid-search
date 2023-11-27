@@ -11,6 +11,7 @@ def main(config: Dict) -> None:
     runtime_pso = None
     runtime_ls = None
     runtime_ga = None
+    runtime_pso_regular = None
     
     if config["cost_function"] == "sphere":
         cost_function = cost_functions.sphere
@@ -152,13 +153,24 @@ def main(config: Dict) -> None:
 
         plot_utils.plot_results_with_population(best_x=best_x, individuals=individuals,
                                                     cost_function=cost_function, x_range=x_range)
+    elif config['search_algorithm'] == 'pso_regular':
+        start_time_pso_regular = time.time()
+        best_x, best_cost, x_history, cost_history, individuals = search_algorithms.pso_regular(cost_function=cost_function, num_particles=config['pso_regular']['num_particles'], max_itr=config['pso_regular']['max_itr'],
+                                                                                        alpha_1=config['pso_regular']['alpha_1'], alpha_2=config['pso_regular']['alpha_2'], alpha_3=config['pso_regular']['alpha_3'],
+                                                                                        x_initial=config['x_initial'], x_range=x_range,
+                                                                                        local_best_option=config['pso_regular']['local_best_option'],
+                                                                                        global_best_option=config['pso_regular']['global_best_option'],
+                                                                                        ls_max_itr=config['pso_regular']['local_search']['max_itr'], ls_convergence_threshold=config['pso_regular']['local_search']['convergence_threshold'])
+        end_time_pso_regular = time.time()
+        runtime_pso_regular = end_time_pso_regular - start_time_pso_regular
+        plot_utils.plot_results_with_population(best_x=best_x, individuals=individuals,
+                                                    cost_function=cost_function, x_range=x_range)
 
     results = {
         'algorithm': config['search_algorithm'],
         'cost_function': config['cost_function'],
         'final_cost': best_cost,
-        'runtime': runtime_pso if config['search_algorithm'] == 'pso' else runtime_ls if config['search_algorithm'] == 'local_search' else runtime_ga
-
+        'runtime': runtime_pso if config['search_algorithm'] == 'pso' else runtime_ls if config['search_algorithm'] == 'local_search' else runtime_ga if config['search_algorithm'] == 'ga' else runtime_pso_regular
     }
     
     if os.path.exists('results.json'):
