@@ -63,7 +63,7 @@ def main(config: Dict) -> None:
     if config["search_algorithm"] == "pso":
         start_time_pso = time.time()
         # generate neighborhoods based on x-range
-        neighborhoods = neighborhood_generation.generate_neighborhoods(5, 5, x_range)
+        neighborhoods = neighborhood_generation.generate_neighborhoods(4, 4, x_range)
 
         # Set up PSO Container that runs algorithm for each particle
         pso_container = particle_class.PSO(
