@@ -1,0 +1,17 @@
+[
+    {
+        "algorithm": "pso",
+        "cost_function": "revenue",
+        "final_cost": -181064551.03671
+    },
+    {
+        "algorithm": "local_search",
+        "cost_function": "sphere",
+        "final_cost": 10476.305842253158
+    },
+    {
+        "algorithm": "ga",
+        "cost_function": "revenue",
+        "final_cost": -181420528.44492036
+    }
+]

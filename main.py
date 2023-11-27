@@ -1,9 +1,14 @@
 import yaml
 from typing import Dict
 from utils import search_algorithms, cost_functions, plot_utils, particle_class, neighborhood_generation
+import json 
+import os
 
 def main(config: Dict) -> None:
     # Get the cost function
+    best_cost = None
+    best_x = None
+
     if config["cost_function"] == "sphere":
         cost_function = cost_functions.sphere
         x_range = [
@@ -115,6 +120,42 @@ def main(config: Dict) -> None:
                         cost_function=cost_function,
                         x_range=neighborhood['neighborhood'],
                     )
+        final_best_costs = [neighborhood['best_cost'] for neighborhood in top_neighborhoods]
+        best_cost = min(final_best_costs)
+
+
+    elif config['search_algorithm'] == 'local_search':
+        best_x, best_cost, x_history, cost_history = search_algorithms.local_search(cost_function=cost_function, max_itr=config['local_search']['max_itr'],
+                                                                                    convergence_threshold=config['local_search']['convergence_threshold'],
+                                                                                    x_initial=config['x_initial'], x_range=x_range)
+        plot_utils.plot_results(best_x=best_x, best_cost=best_cost,
+                                x_history=x_history, cost_history=cost_history,
+                                cost_function=cost_function, x_range=x_range)
+    elif config['search_algorithm'] == 'ga':
+        best_x, best_cost, x_history, cost_history, individuals = search_algorithms.ga(cost_function=cost_function, population_size=config['ga']['population_size'], max_itr=config['ga']['max_itr'],
+                                                                                       mutation_rate=config['ga']['mutation_rate'], crossover_rate=config['ga']['crossover_rate'], x_initial=config['x_initial'],
+                                                                                       x_range=x_range)
+        plot_utils.plot_results_with_population(best_x=best_x, individuals=individuals,
+                                                    cost_function=cost_function, x_range=x_range)
+
+    results = {
+        'algorithm': config['search_algorithm'],
+        'cost_function': config['cost_function'],
+        'final_cost': best_cost,
+    }
+    
+    if os.path.exists('results.json'):
+        with open('results.json', 'r') as f:
+            try:
+                existing_results = json.load(f)
+            except json.JSONDecodeError:
+                existing_results = []
+    else:
+        existing_results = []
+
+    existing_results.append(results)
+    with open('results.json', 'w') as f:
+        json.dump(existing_results, f, indent=4)
 
 if __name__ == "__main__":
     with open("./config/config.yaml", "r") as f:

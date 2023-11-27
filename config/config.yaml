@@ -1,8 +1,18 @@
-search_algorithm: pso  # Options: pso, clash
+search_algorithm:  local_search # Options: pso, clash, ga, local_search
 cost_function: revenue  # Options: sphere, schwefel, schaffer, griewank, func7, func8, func9, func11, revenue
 dimension: 2
 x_initial: null  # A d-dimensional list, such as [1.0, -1.0], or null. If null, the x_initial will be a random point in the domain.
 neighborhood_plot_method: all # Options: single, all
+
+local_search:
+  max_itr: 500
+  convergence_threshold: 0.001
+
+ga:
+  max_itr: 500  # max_itr = number of generations - specifies how many times the GA will evolve the population
+  population_size: 10  # Number of individuals (candidate solutions) in each generation/iteration of the GA
+  mutation_rate: 0.1  # The probability that a new offspring will undergo mutation
+  crossover_rate: 0.8  # The probability that two selected individuals (parents) will undergo crossover to produce offspring
 
 pso:
   max_itr: 500
