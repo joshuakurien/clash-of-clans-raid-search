@@ -1,4 +1,4 @@
-search_algorithm:  local_search # Options: pso, clash, ga, local_search
+search_algorithm: local_search # Options: pso, clash, ga, local_search
 cost_function: revenue  # Options: sphere, schwefel, schaffer, griewank, func7, func8, func9, func11, revenue
 dimension: 2
 x_initial: null  # A d-dimensional list, such as [1.0, -1.0], or null. If null, the x_initial will be a random point in the domain.
