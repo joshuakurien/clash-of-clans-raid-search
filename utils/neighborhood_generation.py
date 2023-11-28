@@ -32,3 +32,12 @@ def generate_neighborhoods(num_col: int, num_row: int,
             neighborhoods.append(current_neighborhood)
 
     return neighborhoods
+
+def print_neighborhood(neighborhood):
+    # rounding the float values
+    neighborhood['neighborhood'] = [ [round(i, 2) for i in elem] for elem in neighborhood['neighborhood'] ]
+    neighborhood['best_x'] = [ round(elem, 2) for elem in neighborhood['best_x'] ]
+    print("Neighborhood range: ", neighborhood['neighborhood'])
+    print("Neighborhood cost: %.2f" % neighborhood['best_cost'])
+    print("Location in neighborhood: ", neighborhood['best_x'])
+    print("")
