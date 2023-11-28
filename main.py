@@ -106,7 +106,7 @@ def main(config: Dict) -> None:
                 x_range=x_range,
                 neighborhood_list=top_neighborhoods
             )
-        else:
+        elif (config["neighborhood_plot_method"] == "single"):
             for neighborhood in top_neighborhoods:
                 neighborhood_generation.print_neighborhood(neighborhood)
                 
@@ -130,6 +130,13 @@ def main(config: Dict) -> None:
                         cost_function=cost_function,
                         x_range=neighborhood['neighborhood'],
                     )
+        else: 
+            for neighborhood in top_neighborhoods:
+                neighborhood_generation.print_neighborhood(neighborhood)
+
+        best_neighborood = min(top_neighborhoods, key=lambda x: x['best_cost'])
+        print ("Best neighborhood =>")
+        neighborhood_generation.print_neighborhood(best_neighborood)
 
 if __name__ == "__main__":
     with open("./config/config.yaml", "r") as f:

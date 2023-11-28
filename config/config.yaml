@@ -2,7 +2,7 @@ search_algorithm: pso  # Options: pso, clash
 cost_function: revenue  # Options: sphere, schwefel, schaffer, griewank, func7, func8, func9, func11, revenue
 dimension: 2
 x_initial: null  # A d-dimensional list, such as [1.0, -1.0], or null. If null, the x_initial will be a random point in the domain.
-neighborhood_plot_method: all # Options: single, all
+neighborhood_plot_method: none # Options: single, all, none
 
 pso:
   max_itr: 500
