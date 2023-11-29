@@ -1,6 +1,6 @@
 import yaml
 from typing import Dict
-from utils import search_algorithms, cost_functions, plot_utils, particle_class
+from utils import search_algorithms, cost_functions, plot_utils, particle_class, neighborhood_generation
 
 def main(config: Dict) -> None:
     # Get the cost function
@@ -52,6 +52,9 @@ def main(config: Dict) -> None:
 
     # Get the search algorithm
     if config["search_algorithm"] == "pso":
+        # generate neighborhoods based on x-range
+        neighborhoods = neighborhood_generation.generate_neighborhoods(5, 5, x_range)
+
         # Set up PSO Container that runs algorithm for each particle
         pso_container = particle_class.PSO(
             cost_function=cost_function,
@@ -63,6 +66,7 @@ def main(config: Dict) -> None:
             ls_convergence_threshold=config["pso"]["local_search"][
                 "convergence_threshold"
             ],
+            neighborhoods=neighborhoods
         )
         
         elixir_max = config["pso"]["max_elixir"]
@@ -73,38 +77,66 @@ def main(config: Dict) -> None:
             pso_container.add_particle(troop)
 
         # Run PSO algorithm with added particles
-        (
-            best_x,
-            best_cost,
-            x_history,
-            cost_history,
-            individuals,
-        ) = pso_container.run_algorithm(x_initial=config["x_initial"])
+        top_neighborhoods = pso_container.run_algorithm_across_neighborhoods()
 
-    if len(best_x) == 2:
-        # If the dimensionality is 2, visualize the results.
-        plot_utils.plot_results(
-            best_x=best_x,
-            best_cost=best_cost,
-            x_history=x_history,
-            cost_history=cost_history,
-            cost_function=cost_function,
-            x_range=x_range,
-        )
-        if (config["search_algorithm"] == "pso") or (
-            config["search_algorithm"] == "ga"
-        ):
-            plot_utils.plot_results_with_population(
-                best_x=best_x,
-                individuals=individuals,
+        # reset neighborhoods in pso container
+        top_neighborhoods_list = []
+        print("Top Neighborhoods before re-iterations =>\n")
+        for neighborhood in top_neighborhoods:
+            top_neighborhoods_list.append(neighborhood['neighborhood'])
+            neighborhood_generation.print_neighborhood(neighborhood)
+
+        pso_container.neighborhoods = top_neighborhoods_list
+        
+        # reiterate over neighborhoods to find better costs
+        cost_improved = True
+        while(cost_improved):
+            top_neighborhoods_iter = pso_container.run_algorithm_across_neighborhoods()
+            neighborhood_replaced = False
+            for i in range(len(top_neighborhoods_iter)):
+                if (top_neighborhoods_iter[i]['best_cost'] < top_neighborhoods[i]['best_cost']):
+                    top_neighborhoods[i] = top_neighborhoods_iter[i]
+                    neighborhood_replaced = True
+            cost_improved = neighborhood_replaced
+
+        print("Top Neighborhoods after re-iterations =>\n")
+        if (config["neighborhood_plot_method"] == "all"):
+            plot_utils.plot_results_multiple_neighborhoods(
                 cost_function=cost_function,
                 x_range=x_range,
+                neighborhood_list=top_neighborhoods
             )
+        elif (config["neighborhood_plot_method"] == "single"):
+            for neighborhood in top_neighborhoods:
+                neighborhood_generation.print_neighborhood(neighborhood)
+                
+                # plotting the neighborhood
+                if len(neighborhood['best_x']) == 2:
+                # If the dimensionality is 2, visualize the results.
+                    plot_utils.plot_results(
+                    best_x=neighborhood['best_x'],
+                    best_cost=neighborhood['best_cost'],
+                    x_history=neighborhood['x_history'],
+                    cost_history=neighborhood['cost_history'],
+                    cost_function=cost_function,
+                    x_range=neighborhood['neighborhood'],
+                )
+                if (config["search_algorithm"] == "pso") or (
+                    config["search_algorithm"] == "ga"
+                ):
+                    plot_utils.plot_results_with_population(
+                        best_x=neighborhood['best_x'],
+                        individuals=neighborhood['individuals'],
+                        cost_function=cost_function,
+                        x_range=neighborhood['neighborhood'],
+                    )
+        else: 
+            for neighborhood in top_neighborhoods:
+                neighborhood_generation.print_neighborhood(neighborhood)
 
-        if config["cost_function"] == "revenue":
-            print(f"Cost of trucks: {best_x[0]}")
-            print(f"Cost of sedans: {best_x[1]}")
-
+        best_neighborood = min(top_neighborhoods, key=lambda x: x['best_cost'])
+        print ("Best neighborhood =>")
+        neighborhood_generation.print_neighborhood(best_neighborood)
 
 if __name__ == "__main__":
     with open("./config/config.yaml", "r") as f:

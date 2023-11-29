@@ -167,6 +167,7 @@ class PSO:
         global_best_option: Optional[str] = "this_iteration",
         ls_max_itr: Optional[int] = 100,
         ls_convergence_threshold: Optional[float] = 0.01,
+        neighborhoods = None,
     ):
         self.cost_function = cost_function
         self.max_itr = max_itr
@@ -176,6 +177,7 @@ class PSO:
         self.ls_max_itr = ls_max_itr
         self.ls_convergence_threshold = ls_convergence_threshold
         self.particle_container = []
+        self.neighborhoods = neighborhoods
 
     def add_particle(self, particle: BaseParticle):
         particle.set_x_range(self.x_range)
@@ -184,16 +186,50 @@ class PSO:
         particle.initialize_particle_internals()
         self.particle_container.append(particle)
 
-    def run_algorithm(self, x_initial: Optional[np.array] = None):
+    def run_algorithm_across_neighborhoods(self):
+        top_neighborhoods = []
+        neighborhood_num = 0
+        for current_neighborhood in self.neighborhoods:
+            print ("Current neighborhood = ", current_neighborhood, ", num = ", neighborhood_num)
+            (
+                best_x,
+                best_cost,
+                x_history,
+                cost_history,
+                individuals,
+            ) = self.run_algorithm(x_initial=None, x_range=current_neighborhood)
+            print ("best_x = ", best_x)
+            print ("best_cost = ", best_cost)
+            neighborhood_data = {'neighborhood': current_neighborhood, 'best_cost': best_cost, 'best_x': best_x,
+                                 'x_history': x_history, 'cost_history': cost_history, 'individuals': individuals}
+            neighborhood_num += 1
+
+            # Check if the current neighborhood is among the top 3
+            if len(top_neighborhoods) < 3:
+                top_neighborhoods.append(neighborhood_data)
+            else:
+                # Check if the current neighborhood has a higher cost than the minimum cost in the top 3
+                max_cost_neighborhood_index, _ = max(enumerate(top_neighborhoods), key=lambda x: x[1]['best_cost'])
+                max_cost_neighborhood = top_neighborhoods[max_cost_neighborhood_index]
+                if best_cost < max_cost_neighborhood['best_cost']:
+                    # Replace the neighborhood with the maximum cost in the top 3
+                    top_neighborhoods[max_cost_neighborhood_index] = neighborhood_data
+            print ("---------------------------------------------------\n")
+        return top_neighborhoods
+
+    def run_algorithm(self, x_initial: Optional[np.array] = None,  x_range = None):
         # Set the x_initial
         if x_initial is None:
             x_initial = [
-                random.uniform(self.x_range[i][0], self.x_range[i][1])
-                for i in range(len(self.x_range))
+                random.uniform(x_range[i][0], x_range[i][1])
+                for i in range(len(x_range))
             ]
 
+        # update all particles for new neighborhood
         for particle in self.particle_container:
             particle.set_best_position(x_initial)
+            particle.set_x_range(x_range)
+            particle.initialize_particle_internals()
 
         overall_best_position = x_initial
         overall_best_cost = float("inf")
