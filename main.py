@@ -89,21 +89,36 @@ def main(config: Dict) -> None:
         # Run PSO algorithm with added particles
         top_neighborhoods = pso_container.run_algorithm_across_neighborhoods()
 
+        # reset neighborhoods in pso container
+        top_neighborhoods_list = []
+        print("Top Neighborhoods before re-iterations =>\n")
+        for neighborhood in top_neighborhoods:
+            top_neighborhoods_list.append(neighborhood['neighborhood'])
+            neighborhood_generation.print_neighborhood(neighborhood)
+
+        pso_container.neighborhoods = top_neighborhoods_list
+        
+        # reiterate over neighborhoods to find better costs
+        cost_improved = True
+        while(cost_improved):
+            top_neighborhoods_iter = pso_container.run_algorithm_across_neighborhoods()
+            neighborhood_replaced = False
+            for i in range(len(top_neighborhoods_iter)):
+                if (top_neighborhoods_iter[i]['best_cost'] < top_neighborhoods[i]['best_cost']):
+                    top_neighborhoods[i] = top_neighborhoods_iter[i]
+                    neighborhood_replaced = True
+            cost_improved = neighborhood_replaced
+
+        print("Top Neighborhoods after re-iterations =>\n")
         if (config["neighborhood_plot_method"] == "all"):
             plot_utils.plot_results_multiple_neighborhoods(
                 cost_function=cost_function,
                 x_range=x_range,
                 neighborhood_list=top_neighborhoods
             )
-        else:
-            print("Top Neighborhoods =>\n")
+        elif (config["neighborhood_plot_method"] == "single"):
             for neighborhood in top_neighborhoods:
-                # rounding the float values
-                neighborhood['neighborhood'] = [ [round(i, 2) for i in elem] for elem in neighborhood['neighborhood'] ]
-                neighborhood['best_x'] = [ round(elem, 2) for elem in neighborhood['best_x'] ]
-                print("Neighborhood range: ", neighborhood['neighborhood'])
-                print("Neighborhood cost: %.2f" % neighborhood['best_cost'])
-                print("Location in neighborhood: ", neighborhood['best_x'])
+                neighborhood_generation.print_neighborhood(neighborhood)
                 
                 # plotting the neighborhood
                 if len(neighborhood['best_x']) == 2:
@@ -125,6 +140,14 @@ def main(config: Dict) -> None:
                         cost_function=cost_function,
                         x_range=neighborhood['neighborhood'],
                     )
+                else: 
+                    for neighborhood in top_neighborhoods:
+                        neighborhood_generation.print_neighborhood(neighborhood)
+
+                    best_neighborood = min(top_neighborhoods, key=lambda x: x['best_cost'])
+                    print ("Best neighborhood =>")
+                    neighborhood_generation.print_neighborhood(best_neighborood)
+                    
         final_best_costs = [neighborhood['best_cost'] for neighborhood in top_neighborhoods]
         best_cost = min(final_best_costs)
         end_time_pso = time.time()

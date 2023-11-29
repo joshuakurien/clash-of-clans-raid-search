@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Callable, Optional, Dict
+from utils import neighborhood_generation
 
 def plot_results_multiple_neighborhoods (neighborhood_list, cost_function: Callable, 
     x_range: Optional[List[List[float]]] = None) -> None:
@@ -26,14 +27,8 @@ def plot_results_multiple_neighborhoods (neighborhood_list, cost_function: Calla
     ax.plot_surface(X1, X2, Z, cmap='viridis', alpha=0.7)
 
     counter = 1
-    print("Top Neighborhoods =>\n")
     for neighborhood in neighborhood_list:
-        # rounding the float values
-        neighborhood['neighborhood'] = [ [round(i, 2) for i in elem] for elem in neighborhood['neighborhood'] ]
-        neighborhood['best_x'] = [ round(elem, 2) for elem in neighborhood['best_x'] ]
-        print("Neighborhood range: ", neighborhood['neighborhood'])
-        print("Neighborhood cost: %.2f" % neighborhood['best_cost'])
-        print("Location in neighborhood: ", neighborhood['best_x'])
+        neighborhood_generation.print_neighborhood(neighborhood)
         
         x1_history = [x[0] for x in neighborhood['x_history']]
         x2_history = [x[1] for x in neighborhood['x_history']]
