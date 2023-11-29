@@ -1,0 +1,32 @@
+[
+    {
+        "algorithm": "pso",
+        "cost_function": "revenue",
+        "final_cost": -181332363.3602757,
+        "runtime": 12.385250806808472
+    },
+    {
+        "algorithm": "ga",
+        "cost_function": "revenue",
+        "final_cost": -181457732.8459237,
+        "runtime": 0.027810096740722656
+    },
+    {
+        "algorithm": "local_search",
+        "cost_function": "revenue",
+        "final_cost": 274225900.64544237,
+        "runtime": 0.011097908020019531
+    },
+    {
+        "algorithm": "pso_regular",
+        "cost_function": "revenue",
+        "final_cost": -181377617.65602878,
+        "runtime": 1.0116119384765625
+    },
+    {
+        "algorithm": "pso",
+        "cost_function": "revenue",
+        "final_cost": -179416019.04740113,
+        "runtime": 7.263932943344116
+    }
+]

@@ -1,9 +1,18 @@
 import yaml
 from typing import Dict
 from utils import search_algorithms, cost_functions, plot_utils, particle_class, neighborhood_generation
+import json 
+import os
+import time
 
 def main(config: Dict) -> None:
     # Get the cost function
+    best_cost = None
+    runtime_pso = None
+    runtime_ls = None
+    runtime_ga = None
+    runtime_pso_regular = None
+    
     if config["cost_function"] == "sphere":
         cost_function = cost_functions.sphere
         x_range = [
@@ -52,8 +61,9 @@ def main(config: Dict) -> None:
 
     # Get the search algorithm
     if config["search_algorithm"] == "pso":
+        start_time_pso = time.time()
         # generate neighborhoods based on x-range
-        neighborhoods = neighborhood_generation.generate_neighborhoods(5, 5, x_range)
+        neighborhoods = neighborhood_generation.generate_neighborhoods(4, 4, x_range)
 
         # Set up PSO Container that runs algorithm for each particle
         pso_container = particle_class.PSO(
@@ -130,13 +140,74 @@ def main(config: Dict) -> None:
                         cost_function=cost_function,
                         x_range=neighborhood['neighborhood'],
                     )
-        else: 
-            for neighborhood in top_neighborhoods:
-                neighborhood_generation.print_neighborhood(neighborhood)
+                else: 
+                    for neighborhood in top_neighborhoods:
+                        neighborhood_generation.print_neighborhood(neighborhood)
 
-        best_neighborood = min(top_neighborhoods, key=lambda x: x['best_cost'])
-        print ("Best neighborhood =>")
-        neighborhood_generation.print_neighborhood(best_neighborood)
+                    best_neighborood = min(top_neighborhoods, key=lambda x: x['best_cost'])
+                    print ("Best neighborhood =>")
+                    neighborhood_generation.print_neighborhood(best_neighborood)
+                    
+        final_best_costs = [neighborhood['best_cost'] for neighborhood in top_neighborhoods]
+        best_cost = min(final_best_costs)
+        end_time_pso = time.time()
+        runtime_pso = end_time_pso - start_time_pso
+
+
+
+    elif config['search_algorithm'] == 'local_search':
+        start_time_ls = time.time()
+        best_x, best_cost, x_history, cost_history = search_algorithms.local_search(cost_function=cost_function, max_itr=config['local_search']['max_itr'],
+                                                                                    convergence_threshold=config['local_search']['convergence_threshold'],
+                                                                                    x_initial=config['x_initial'], x_range=x_range)
+        end_time_ls = time.time()
+        runtime_ls = end_time_ls - start_time_ls
+
+        plot_utils.plot_results(best_x=best_x, best_cost=best_cost,
+                                x_history=x_history, cost_history=cost_history,
+                                cost_function=cost_function, x_range=x_range)
+    elif config['search_algorithm'] == 'ga':
+        start_time_ga = time.time()
+        best_x, best_cost, x_history, cost_history, individuals = search_algorithms.ga(cost_function=cost_function, population_size=config['ga']['population_size'], max_itr=config['ga']['max_itr'],
+                                                                                       mutation_rate=config['ga']['mutation_rate'], crossover_rate=config['ga']['crossover_rate'], x_initial=config['x_initial'],
+                                                                                       x_range=x_range)
+        end_time_ga = time.time()
+        runtime_ga = end_time_ga - start_time_ga
+
+        plot_utils.plot_results_with_population(best_x=best_x, individuals=individuals,
+                                                    cost_function=cost_function, x_range=x_range)
+    elif config['search_algorithm'] == 'pso_regular':
+        start_time_pso_regular = time.time()
+        best_x, best_cost, x_history, cost_history, individuals = search_algorithms.pso_regular(cost_function=cost_function, num_particles=config['pso_regular']['num_particles'], max_itr=config['pso_regular']['max_itr'],
+                                                                                        alpha_1=config['pso_regular']['alpha_1'], alpha_2=config['pso_regular']['alpha_2'], alpha_3=config['pso_regular']['alpha_3'],
+                                                                                        x_initial=config['x_initial'], x_range=x_range,
+                                                                                        local_best_option=config['pso_regular']['local_best_option'],
+                                                                                        global_best_option=config['pso_regular']['global_best_option'],
+                                                                                        ls_max_itr=config['pso_regular']['local_search']['max_itr'], ls_convergence_threshold=config['pso_regular']['local_search']['convergence_threshold'])
+        end_time_pso_regular = time.time()
+        runtime_pso_regular = end_time_pso_regular - start_time_pso_regular
+        plot_utils.plot_results_with_population(best_x=best_x, individuals=individuals,
+                                                    cost_function=cost_function, x_range=x_range)
+
+    results = {
+        'algorithm': config['search_algorithm'],
+        'cost_function': config['cost_function'],
+        'final_cost': best_cost,
+        'runtime': runtime_pso if config['search_algorithm'] == 'pso' else runtime_ls if config['search_algorithm'] == 'local_search' else runtime_ga if config['search_algorithm'] == 'ga' else runtime_pso_regular
+    }
+    
+    if os.path.exists('results.json'):
+        with open('results.json', 'r') as f:
+            try:
+                existing_results = json.load(f)
+            except json.JSONDecodeError:
+                existing_results = []
+    else:
+        existing_results = []
+
+    existing_results.append(results)
+    with open('results.json', 'w') as f:
+        json.dump(existing_results, f, indent=4)
 
 if __name__ == "__main__":
     with open("./config/config.yaml", "r") as f:
