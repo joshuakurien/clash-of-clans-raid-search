@@ -1,4 +1,10 @@
-# Clash of Clans Optimizer
+# ECE 457A Final Project - Clash of Clans Particle Swarm Optimizer
+
+**Authors:** Avery Chiu, Brandon Goh, Jessica Wormald, Mathurah Ravigulan, Mansheel Chahal, Joshua Kurien
+![Alt text](image.png)
+
+### Summary 
+This project puts a twist on the Particle Swarm Optimization Algorithm tailored to the dynamics of the popular video game Clash of Clans. The proposed Clash of Clans Optimizer utilizes diverse troop types with unique characteristics, presenting a dynamic balance between exploration and exploitation in multi-dimensional search applications. 
 
 ## Introduction
 
@@ -32,13 +38,13 @@ This repository contains the implementation of a novel metaheuristic optimizatio
     pip install -r requirements.txt
     ```
     
-3. Run the optimizer
-    ```
-    python main.py
-    ```
+### Instructions to run
+Run the `main.py` file. Edit the `config.py` to customize which algorithm to run and cost function to run. Available options: 
+- `pso`: Clash of Clans PSO algorithm 
+- `pso_regular`: Regular PSO algorithm
+- `ga`: Genetic Algorithm
+- `local_search`: Local Search
 
-Note that you can edit the config.yaml to try different cost functions and other optimization algorithms.
-Set the search_algorithm to "pso" to try the Clash of Clans particle swarm optimizer. You can also tune the elixir cost here.
 
 ## Baseline
 
