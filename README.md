@@ -30,7 +30,7 @@ This repository contains the implementation of a novel metaheuristic optimizatio
 
    ```bash
    git clone https://github.com/joshuakurien/clash-of-clans-raid-search
-   cd clash-of-clans-optimizer
+   cd clash-of-clans-raid-search
    ```
 
 2. Install dependencies
