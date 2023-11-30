@@ -28,5 +28,77 @@
         "cost_function": "revenue",
         "final_cost": -179416019.04740113,
         "runtime": 7.263932943344116
+    },
+    {
+        "algorithm": "pso",
+        "cost_function": "griewank",
+        "final_cost": 0.0,
+        "runtime": 18.7809476852417
+    },
+    {
+        "algorithm": "ga",
+        "cost_function": "griewank",
+        "final_cost": 0.017668157859585754,
+        "runtime": 0.04780864715576172
+    },
+    {
+        "algorithm": "local_search",
+        "cost_function": "griewank",
+        "final_cost": 0.7173885164256175,
+        "runtime": 0.008006811141967773
+    },
+    {
+        "algorithm": "pso_regular",
+        "cost_function": "griewank",
+        "final_cost": 0.0073960944278980145,
+        "runtime": 2.2146825790405273
+    },
+    {
+        "algorithm": "pso",
+        "cost_function": "schwefel",
+        "final_cost": 6.689385957355341,
+        "runtime": 16.480188131332397
+    },
+    {
+        "algorithm": "pso_regular",
+        "cost_function": "schwefel",
+        "final_cost": 123.70750017327083,
+        "runtime": 2.830244779586792
+    },
+    {
+        "algorithm": "ga",
+        "cost_function": "schwefel",
+        "final_cost": 5.167365266287504,
+        "runtime": 0.049709320068359375
+    },
+    {
+        "algorithm": "local_search",
+        "cost_function": "schwefel",
+        "final_cost": 510.6344747057123,
+        "runtime": 0.008993864059448242
+    },
+    {
+        "algorithm": "pso",
+        "cost_function": "schaffer",
+        "final_cost": 0.0,
+        "runtime": 22.980085134506226
+    },
+    {
+        "algorithm": "pso_regular",
+        "cost_function": "schaffer",
+        "final_cost": 0.0159025015892037,
+        "runtime": 1.8282837867736816
+    },
+    {
+        "algorithm": "ga",
+        "cost_function": "schaffer",
+        "final_cost": 2.5148953006188166,
+        "runtime": 0.03968405723571777
+    },
+    {
+        "algorithm": "local_search",
+        "cost_function": "schaffer",
+        "final_cost": 10.012826027134793,
+        "runtime": 0.008998394012451172
     }
 ]
