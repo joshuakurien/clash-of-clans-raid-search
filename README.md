@@ -78,6 +78,9 @@ We would like to express our sincere appreciation to Professor Benyamin Ghojogh 
 
 2. J. Kennedy and R. Eberhart, “Particle swarm optimization,” in *Proceedings of ICNN’95-international conference on neural networks*, vol. 4, pp. 1942–1948, IEEE, 1995.
 
-3. Clash of Clans Wiki. (n.d.). [Online]. Available: [Clash of Clans Wiki](https://clashofclans.fandom.com/wiki).
+3. Benyamin Ghojogh, "Metaheuristic-Optimization" GitHub repository. [Online]. Available: [Metaheuristic-Optimization](https://github.com/bghojogh/Metaheuristic-Optimization).
+
+4. Clash of Clans Wiki. (n.d.). [Online]. Available: [Clash of Clans Wiki](https://clashofclans.fandom.com/wiki).
+
 
 
