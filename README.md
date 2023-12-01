@@ -1,4 +1,5 @@
 # ECE 457A Final Project - Clash of Clans Particle Swarm Optimizer
+[Clash of Clans Optimizer Paper](https://github.com/joshuakurien/clash-of-clans-raid-search/files/13520445/ECE457A_ClashofClans_Algorithm.pdf)
 
 **Authors:** Avery Chiu, Brandon Goh, Jessica Wormald, Mathurah Ravigulan, Mansheel Chahal, Joshua Kurien
 ![Alt text](image.png)
